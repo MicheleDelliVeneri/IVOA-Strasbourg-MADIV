@@ -472,7 +472,7 @@ almasim simulation run     --skymodel point --backend local --save-format h5
   </div>
   <div class="border-l-4 border-[#E70068] pl-3 py-2">
     <code>products resolve</code> is the one that takes us into <b>IVOA DataLink</b> — and where the trouble starts at PB scale.
-  </div
+  </div>
 </div>
 
 ---
