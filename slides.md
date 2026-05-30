@@ -279,7 +279,7 @@ flowchart LR
 
 <div>
 
-# Data Augmentation
+# Data Enhancement
 
 ```mermaid {scale: 0.48}
 flowchart LR
@@ -395,7 +395,7 @@ What we already have — and what WP1 has to upgrade
 
 ---
 
-# ALMASim is a library-first Python stack
+# ALMASim V2
 
 <div class="grid grid-cols-2 gap-6 text-sm">
 
@@ -426,21 +426,12 @@ Same staged API drives the **CLI**, a **FastAPI** backend, and Jupyter notebooks
 
 <div>
 
-<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
+<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs mb-3">
   <div class="font-semibold mb-1">Why library-first</div>
   WP1 needs ALMASim to be <b>callable</b> from training loops, Dask graphs, Slurm jobs, and a browser-based UI — without rewriting the simulation logic four times.
 </div>
 
-<div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
-  <div class="font-semibold mb-1">Outputs</div>
-  Dirty cube, beam cube, UV mask, dirty / model visibilities, ML-ready <b>HDF5 shards</b> (clean + dirty + vis + mask + metadata), and native MeasurementSets via <code>casatools</code> or <code>python-casacore</code>.
-</div>
-
-<div class="mt-3 text-xs opacity-70">
-
-Optional <code>[casa]</code> extra (Linux x86-64) for native MS export and <code>applycal</code>; <code>[ms-casacore]</code> fallback works everywhere.
-
-</div>
+<img src="./images/almasim-frontend.png" class="rounded shadow w-full" alt="ALMASim v2 web frontend" />
 
 </div>
 </div>
@@ -481,7 +472,7 @@ almasim simulation run     --skymodel point --backend local --save-format h5
   </div>
   <div class="border-l-4 border-[#E70068] pl-3 py-2">
     <code>products resolve</code> is the one that takes us into <b>IVOA DataLink</b> — and where the trouble starts at PB scale.
-  </div>
+  </div
 </div>
 
 ---
@@ -550,7 +541,7 @@ layout: section
 
 # 5 · The data-access gap
 
-DataLink was not designed for *training* — it was designed for *retrieval*
+DataLink was not designed for tranfering TBs of data for DL training — it was designed for *retrieval* of observations 
 
 ---
 
@@ -692,11 +683,9 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 # What we hope to bring back from this meeting
 
 
-- **A signal** on whether a *bulk transfer + processed tier* belongs inside the DataLink remit, or alongside it as a new IVOA service.
-- **Concrete patterns** other communities are already using — SODA shapes, multi-ID DataLink responses, transport profiles.
+- **A signal** on whether a *bulk transfer + processed tier* could be shipped alongside Datalink as a new IVOA standardized service.
 - **Metadata exposure** — what it would take to put proposal abstracts and linked publications behind TAP, with stable IVOIDs.
-- **A community-curated, standards-conformant "ML-ready ALMA" tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
-- **Connections** with groups solving the same problem on optical, IR, or X-ray archives. The ALMA shape will not be unique for long.
+- **A community-curated, standards-conformant tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
 
 
 <div class="mt-6 p-4 bg-[#E70068]/8 border-l-4 border-[#E70068] text-sm">
@@ -724,7 +713,7 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 <div class="mt-2 space-y-2">
 
 <div class="border-l-4 border-emerald-500 pl-3 py-1.5">
-  <b>Science data excluded.</b> §3.3 — AI solutions used solely for science data are out of scope. MADIV's training pipelines fall here.
+  <b>Science data excluded.</b> §3.3 — AI solutions used solely for science data are out of scope. MADIV abides to this regulation and infact it is exploring only on ALMA data.
 </div>
 
 <div class="border-l-4 border-[#E70068] pl-3 py-1.5">
@@ -755,7 +744,7 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 
 ---
 
-# Two tools, two jobs
+# AI Tools employed at the SKA Observatory
 
 <div class="grid grid-cols-2 gap-6 text-sm">
 
@@ -893,7 +882,6 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 </div>
 
 </div>
-
 <div>
 
 **Doesn't work / guardrails**
