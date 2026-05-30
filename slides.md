@@ -200,7 +200,7 @@ BRAIN trained `DeepFocus` primarily on **simulated** cubes. The reason is uncomf
 </div>
 
 <div class="border-l-4 border-amber-500 pl-3 py-3">
-  <div class="font-semibold mb-1">DeepGRU et al. don't generalise</div>
+  <div class="font-semibold mb-1">Models trained on simulations don't generalise</div>
   Models trained on simulation distributions <b>do not transfer reliably</b> to real ALMA cubes. This is the well-known ML failure mode — and it bites hard in radio interferometry.
 </div>
 
@@ -218,7 +218,7 @@ layout: section
 
 # 3 · MADIV — Metadata-Aware Direct Imaging from Visibilities
 
-co-funded by ESO and SKAO &nbsp;·&nbsp; 36 months &nbsp;·&nbsp; starts Q2 2026
+co-funded by ESO and SKAO &nbsp;·&nbsp; 36 months &nbsp;·&nbsp; starts September 2026
 
 ---
 
@@ -261,50 +261,65 @@ Plus an **anomaly-scoring** head: reconstructions that fall outside the learned 
 
 ---
 
-# The training-set augmentation pipeline
+# Simulating Realistic Calibrated Visibilties
 
-<div class="grid grid-cols-[1.4fr_1fr] gap-6 items-start">
+```mermaid {scale: 0.45}
+flowchart LR
+  A[ALMA Archive<br/>Cycle 7+ & LPs] --> B[ALMASim v2]
+  B --> D[Calibrated Visibilities]
+  D --> C[WSClean]
+  C --> W[Real Clean Cubes]
+  W --> E[ALMASim]
+  E --> F[Simulated Calibrated Visibilities]
+  F --> G[Diffusion Model<br/>vis refinement]
+  D --> G[Diffusion Model<br/>vis refinement]
+  G --> H[Simulated Calibrated Visibilities]
+```
+<div class="grid grid-cols-[2fr_1fr] gap-6 items-start">
 
 <div>
 
-```mermaid {scale: 0.55}
+# Data Augmentation
+
+```mermaid {scale: 0.48}
 flowchart LR
-  A[ALMA Archive<br/>Cycle 7 onward + LPs] --> B[ALMASim v2<br/>retrieves raw vis,<br/>calib tables, metadata,<br/>abstracts, publications]
-  B --> C[Real clean cubes +<br/>real calibrated vis]
-  C --> D[Forward simulation<br/>through ALMASim]
-  D --> E[Simulated dirty cubes<br/>+ dirty vis]
-  C --> F[NOISEMPIRE<br/>extracts empirical<br/>noise patterns]
-  F --> E
-  E --> G[Diffusion Model<br/>minimises distance to<br/>real visibilities]
-  G --> H[Augmented training set<br/>physically-faithful<br/>realistic-noise vis]
-  B --> I[MAT corpus<br/>abstracts + metadata<br/>+ linked publications]
+  A[Simulated Skymodel] --> B[ALMASim]
+  B --> D[Calibrated Visibilities]
+  D --> C[Diffusion Model]
+  C --> W[Realistic Calibrated Visibilities]
+```
+
+# Training the Visual Transformer
+
+```mermaid {scale: 0.48}
+flowchart LR
+ A[ALMA Archive<br/>Cycle 7+ & LPs] --> I[MAT corpus<br/>abstracts · metadata<br/>· publications]
+  A --> B[ALMASim]
+  B --> F[Simulated Calibrated Visibilities]
+  B --> H[Calibrated Visibilties]
   H --> J((ViT + MAT))
   I --> J
+  F --> J
   J --> K[Clean 3D cubes<br/>+ anomaly score]
 ```
 
 </div>
 
-<div class="text-xs space-y-3">
+<div class="text-xs space-y-3 mt-4">
 
 <div class="border-l-2 border-emerald-500 pl-2">
 <div class="font-semibold">ALMASim v2</div>
-Refactored to fetch raw vis, calibration, **abstracts**, metadata, **publications** from the archive — not just generate synthetic skies.
-</div>
-
-<div class="border-l-2 border-[#E70068] pl-2">
-<div class="font-semibold">NOISEMPIRE</div>
-Empirical noise extracted from real ALMA images is **injected** into simulated dirty cubes.
+Fetches raw vis, calibration, abstracts, metadata, publications — not just synthetic skies.
 </div>
 
 <div class="border-l-2 border-violet-500 pl-2">
 <div class="font-semibold">Diffusion refinement</div>
-A DM is trained to make simulated visibilities **indistinguishable** from real ones — *physically-plausible* data augmentation.
+DM makes simulated vis **indistinguishable** from real — physically-plausible augmentation.
 </div>
 
 <div class="border-l-2 border-amber-500 pl-2">
 <div class="font-semibold">ViT + MAT</div>
-The augmented vis + MAT priors feed the ViT, which outputs cleaned cubes. Anomaly score on the side.
+Augmented vis + MAT priors feed ViT → clean cubes + anomaly score.
 </div>
 
 </div>
@@ -323,7 +338,7 @@ The augmented vis + MAT priors feed the ViT, which outputs cleaned cubes. Anomal
   <ul class="ml-4 list-disc">
     <li>Archive integration (raw vis, calib, metadata, abstracts, papers)</li>
     <li>Web app (FastAPI + Svelte)</li>
-    <li>NOISEMPIRE integration</li>
+    <li>CLI and Slurm optimization</li>
     <li>Diffusion model refinement</li>
     <li>Physical data augmentation</li>
     <li><b>D1.1</b> ALMASim v2 release</li>
@@ -440,7 +455,7 @@ Four sub-apps, one for each stage of the *real-data* workflow. Each is a thin wr
 
 </div>
 
-```bash {all|1|2-4|6|8|10|12|14}
+```bash
 almasim --help
 
 almasim metadata query \
@@ -477,7 +492,7 @@ almasim simulation run     --skymodel point --backend local --save-format h5
 
 <div>
 
-```mermaid {scale: 0.50}
+```mermaid {scale: 0.36}
 sequenceDiagram
   participant U as User / training loop
   participant AS as ALMASim
@@ -541,38 +556,38 @@ DataLink was not designed for *training* — it was designed for *retrieval*
 
 # What works, what doesn't
 
-<div class="grid grid-cols-2 gap-6 text-sm">
+<div class="grid grid-cols-2 gap-6 text-xs">
 
 <div>
 
 **What works well today**
 
-- **TAP / ObsCore** discovery is excellent — `pyvo` + ADQL gives us everything we need to build a science-keyword-filtered cohort
-- **DataLink** correctly resolves a member OUS UID to its set of files — VOTable, `access_url`, `semantics`, `content_length`
-- File-level transport over HTTP / FTP works at single-file scale
+- **TAP / ObsCore** discovery — `pyvo` + ADQL covers science-keyword-filtered cohort builds
+- **DataLink** resolves an OUS UID to its file list — VOTable, `access_url`, `semantics`, `content_length`
+- File-level HTTP / FTP transport at single-file scale
 
 **What stops working at MADIV scale**
 
-- We're not asking for **one** dataset; we're asking for **thousands** of OUSs from Cycle 7 onward — repeated several times across LPs
-- That's **tens to hundreds of TB** of raw visibilities + calibration tables, and **PB-scale** if we move to all Cycles
-- Sustained bulk transfer at this scale is **not what DataLink was designed for**
+- Need **thousands** of OUSs from Cycle 7+ — not one dataset
+- **Tens to hundreds of TB** of raw vis + cal tables; **PB-scale** across all Cycles
+- Sustained bulk transfer is **not what DataLink was designed for**
 
 </div>
 
 <div>
 
-<div class="border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-4 py-3 text-xs">
+<div class="border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-4 py-2 text-xs">
   <div class="font-semibold mb-1">Three concrete pain points</div>
-  <ol class="mt-1 ml-4 list-decimal space-y-1">
-    <li><b>Per-product round trips</b>. One <code>datalink/sync</code> call per <code>member_ous_uid</code>; one HTTP fetch per file. Thousands of OUSs × dozens of files each = a lot of round trips against a small set of mirrors.</li>
-    <li><b>No bulk-transfer mode</b>. There is no standard way to say <i>"give me the raw vis for every OUS in this list, in one negotiated transfer"</i>.</li>
-    <li><b>Mirror-side rate caps</b>. ALMASim hard-codes a per-mirror concurrency limit because the mirrors are <b>shared infrastructure</b> with the wider community — we cannot saturate them.</li>
+  <ol class="mt-1 ml-4 list-decimal space-y-0.5">
+    <li><b>Per-product round trips.</b> One <code>datalink/sync</code> call per UID; one fetch per file. Thousands of OUSs × dozens of files = massive round-trip count against a small mirror set.</li>
+    <li><b>No bulk-transfer mode.</b> No standard way to say "give me all raw vis for this OUS list in one negotiated transfer."</li>
+    <li><b>Mirror-side rate caps.</b> ALMASim caps per-mirror concurrency — mirrors are <b>shared infrastructure</b>; we cannot saturate them.</li>
   </ol>
 </div>
 
-<div class="mt-3 border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-4 py-3 text-xs">
+<div class="mt-2 border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-4 py-2 text-xs">
   <div class="font-semibold mb-1">From BRAIN, verbatim</div>
-  Retrieving sufficient real data "would require <b>thousands of requests via the helpdesk</b> and extensive processing with CASA, averaging <b>1–2 hours per cube</b>."
+  "Would require <b>thousands of requests via the helpdesk</b> and extensive processing with CASA, averaging <b>1–2 hours per cube</b>."
 </div>
 
 </div>
@@ -582,54 +597,48 @@ DataLink was not designed for *training* — it was designed for *retrieval*
 
 # Raw visibilities are not training data
 
-<div class="text-sm mb-3">
-
-Even if we transfer everything, what we get is **not** ML-ready. ALMASim has to do this for every OUS, every time:
-
-</div>
-
 <div class="grid grid-cols-2 gap-6 text-xs">
 
 <div>
 
-```mermaid {scale: 0.55}
+<div class="text-sm mb-2">Even if we transfer everything, what we get is <b>not</b> ML-ready. ALMASim runs this for every OUS, every time:</div>
+
+```mermaid {scale: 0.6}
 flowchart LR
-  A[ASDM<br/>raw delivered<br/>by ALMA] --> B[importasdm<br/>CASA]
-  B --> C[MeasurementSet<br/>uncalibrated]
-  C --> D[applycal<br/>with delivered<br/>calibration tables]
-  D --> E[Calibrated MS<br/>science vis]
-  E --> F[ALMASim<br/>UV grid / FFT]
-  F --> G[Dirty cube +<br/>dirty vis +<br/>UV mask cube]
+  A[ASDM<br/>raw] --> B[importasdm]
+  B --> C[MS<br/>uncalibrated]
+  C --> D[applycal]
+  D --> E[Calibrated MS]
+  E --> F[UV grid / FFT]
+  F --> G[Dirty cube +<br/>vis + mask]
   G --> H[HDF5 shard<br/>ML-ready]
 ```
 
 </div>
 
-<div>
-
-<div class="border-l-4 border-[#E70068] pl-3 py-2">
-  <b>importasdm.</b> CASA-only. <b>Linux x86-64</b> wheels only. Ten to hundreds of GB per OUS for big LPs.
 </div>
 
-<div class="mt-2 border-l-4 border-[#E70068] pl-3 py-2">
-  <b>applycal.</b> Calibration tables ship with the delivery. CASA-only. Failure modes (missing antennas, flagged scans) are dataset-specific.
+<div class="space-y-2">
+
+<div class="border-l-4 border-[#E70068] pl-3 py-1.5">
+  <b>importasdm.</b> CASA-only. Linux x86-64 only. 10s–100s GB per OUS for big LPs.
 </div>
 
-<div class="mt-2 border-l-4 border-[#E70068] pl-3 py-2">
-  <b>UV gridding + FFT.</b> Cube dims (Nx · Ny · Nch) decide memory footprint; mosaics multiply by Nfields.
+<div class="border-l-4 border-[#E70068] pl-3 py-1.5">
+  <b>applycal.</b> Cal tables ship with the delivery. CASA-only. Failure modes are dataset-specific.
 </div>
 
-<div class="mt-2 border-l-4 border-amber-500 pl-3 py-2">
-  <b>Domain expertise required.</b> Every step above is <i>radio-interferometric specialist work</i>. Most ML groups don't have it — and don't <i>need</i> it if the products are delivered ML-ready.
+<div class="border-l-4 border-[#E70068] pl-3 py-1.5">
+  <b>UV gridding + FFT.</b> Memory scales with Nx · Ny · Nch; mosaics multiply by Nfields.
 </div>
 
+<div class="border-l-4 border-amber-500 pl-3 py-1.5">
+  <b>Domain expertise required.</b> All steps above are radio-interferometric specialist work — most ML groups don't have it, and don't need it if products arrive ML-ready.
 </div>
 
+<div class="border-l-4 border-slate-400 pl-3 py-1.5">
+  <b>The cost is duplicated.</b> Every group repeats the same calibration, gridding, and HDF5 sharding against the same archive. Compute and bandwidth paid many times over.
 </div>
-
-<div class="mt-4 text-sm">
-
-**The cost is duplicated.** Every group training an imaging model has to repeat this — the same calibration, the same gridding, the same HDF5 sharding — against the same archive. The compute and bandwidth are paid many times over.
 
 </div>
 
@@ -666,7 +675,7 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
     <li><b>SKA Regional Centres</b> will face exactly this — only at <b>700 PB/yr</b> rather than 1 TB/day</li>
     <li><b>ngVLA</b> sits in the same regime</li>
     <li>Every <b>ML-for-radio</b> group is building a private version of the ALMASim pipeline today; that work is fungible</li>
-    <li>This is the IVOA Strasbourg audience's <b>natural problem space</b> — discovery, access, transport, semantics — applied to a use case (large-scale training) the standards weren't originally written for</li>
+    <li>This is the IVOA <b>natural problem space</b> — discovery, access, transport, semantics — applied to a use case (large-scale training) the standards weren't originally written for</li>
   </ul>
 </div>
 
@@ -682,7 +691,6 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
 # What we hope to bring back from this meeting
 
-<v-clicks>
 
 - **A signal** on whether a *bulk transfer + processed tier* belongs inside the DataLink remit, or alongside it as a new IVOA service.
 - **Concrete patterns** other communities are already using — SODA shapes, multi-ID DataLink responses, transport profiles.
@@ -690,7 +698,6 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 - **A community-curated, standards-conformant "ML-ready ALMA" tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
 - **Connections** with groups solving the same problem on optical, IR, or X-ray archives. The ALMA shape will not be unique for long.
 
-</v-clicks>
 
 <div class="mt-6 p-4 bg-[#E70068]/8 border-l-4 border-[#E70068] text-sm">
   Closing the simulation-to-real gap is, fundamentally, a <b>community infrastructure problem</b>. MADIV is one of the projects that has to solve it for itself — but every group will hit it. Let's solve it once.
