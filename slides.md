@@ -713,31 +713,212 @@ How we are building MADIV — coding agents, agentic pipelines, dev practice
 
 ---
 
-# AI-assisted development at SKAO — *to be filled in*
+# SKAO AI Policy — the governance frame
 
-<div class="text-sm">
+<div class="grid grid-cols-2 gap-6 text-xs">
 
-This second half of the talk will cover how the MADIV team, and SKAO more broadly, are integrating AI coding agents into day-to-day development:
+<div>
+
+SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for development teams:
+
+<div class="mt-2 space-y-2">
+
+<div class="border-l-4 border-emerald-500 pl-3 py-1.5">
+  <b>Science data excluded.</b> §3.3 — AI solutions used solely for science data are out of scope. MADIV's training pipelines fall here.
+</div>
+
+<div class="border-l-4 border-[#E70068] pl-3 py-1.5">
+  <b>Only Unrestricted data in AI tools.</b> §5.5 privacy control — no restricted, personal, or special-category data may enter any AI system.
+</div>
+
+<div class="border-l-4 border-amber-500 pl-3 py-1.5">
+  <b>Code generation = Moderate risk.</b> §5.3.7 — all AI-generated code must follow SKA software quality assurance: human review + testing before merge.
+</div>
+
+<div class="border-l-4 border-violet-500 pl-3 py-1.5">
+  <b>New tool → IT helpdesk ticket.</b> §5.2.2 — any third-party AI tool that processes SKAO data must be assessed by IT + InfoSec before use.
+</div>
 
 </div>
 
-<div class="mt-4 grid grid-cols-2 gap-4 text-xs">
-  <div class="border-l-4 border-slate-300 dark:border-slate-600 pl-3 py-2 opacity-60">
-    Coding agents for <b>code generation and review</b>
-  </div>
-  <div class="border-l-4 border-slate-300 dark:border-slate-600 pl-3 py-2 opacity-60">
-    Agentic pipelines for <b>automated code curation</b>
-  </div>
-  <div class="border-l-4 border-slate-300 dark:border-slate-600 pl-3 py-2 opacity-60">
-    AI-assisted <b>UI development</b> (FastAPI + Svelte for ALMASim v2)
-  </div>
-  <div class="border-l-4 border-slate-300 dark:border-slate-600 pl-3 py-2 opacity-60">
-    Lessons learned, guardrails, what doesn't work
-  </div>
 </div>
 
-<div class="mt-8 p-4 bg-amber-50/60 dark:bg-amber-900/15 border-l-4 border-amber-400 text-xs">
-  <i>Placeholder slide — content to be drafted in collaboration with the SKAO dev practice team before the meeting.</i>
+<div>
+
+<img src="./images/ai-dashboard.png" class="rounded shadow w-full" alt="SKAO AI governance dashboard" />
+
+<div class="mt-2 text-xs opacity-70 text-center">SKAO AI adoption governance dashboard — budget, approvals, lifecycle tracking</div>
+
+</div>
+
+</div>
+
+---
+
+# Two tools, two jobs
+
+<div class="grid grid-cols-2 gap-6 text-sm">
+
+<div>
+
+<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs mb-3">
+  <div class="font-semibold mb-1">Claude Code / GPT  — agentic coding assistant</div>
+  <ul class="ml-4 list-disc space-y-0.5">
+    <li>Used for most software development at the SKA Observatory</li>
+    <li>Used for ALMASim v2 refactoring — library-first architecture, service decomposition</li>
+    <li>FastAPI + Svelte UI scaffolding and iteration</li>
+    <li>Simulation pipeline code, HDF5 shard format, CLI wiring</li>
+    <li>Slides and documentation drafting (this talk!)</li>
+  </ul>
+</div>
+
+<div class="border-l-4 border-emerald-500 bg-emerald-50/40 dark:bg-emerald-900/15 pl-4 py-3 text-xs">
+  <div class="font-semibold mb-1">Greptile — AI code review agent</div>
+  <ul class="ml-4 list-disc space-y-0.5">
+    <li>Reviews PRs automatically across all SKAO repositories</li>
+    <li>Flags critical bugs, security issues, and regressions before human review</li>
+    <li>Complements — does not replace — mandatory human review (per §5.3.7)</li>
+  </ul>
+</div>
+
+</div>
+
+<div>
+
+<div class="text-xs font-semibold mb-1 opacity-70">Top models by premium requests — SKAO</div>
+<img src="./images/image.png" class="rounded shadow w-full" alt="Top AI models at SKAO" />
+
+</div>
+
+</div>
+
+---
+
+# Greptile in numbers — one month across 15 repos
+
+<div class="grid grid-cols-[1fr_1.2fr] gap-6 items-start">
+
+<div class="text-xs space-y-3">
+
+<div class="border-l-4 border-emerald-500 bg-emerald-50/40 dark:bg-emerald-900/15 pl-3 py-2">
+  <div class="text-2xl font-bold text-emerald-600">668</div>
+  <div class="font-semibold">PRs reviewed by Greptile</div>
+  <div class="opacity-70">+5467% vs baseline period — adoption ramped fast once tool was approved</div>
+</div>
+
+<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-3 py-2">
+  <div class="text-2xl font-bold" style="color:#E70068">233</div>
+  <div class="font-semibold">Critical bugs caught</div>
+  <div class="opacity-70">Across 15 repos — before human review, before merge</div>
+</div>
+
+<div class="border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-3 py-2">
+  <div class="text-2xl font-bold text-amber-600">5.4 d</div>
+  <div class="font-semibold">Avg merge time</div>
+  <div class="opacity-70">−71.52% — faster review cycle with AI first pass</div>
+</div>
+
+<div class="border-l-4 border-slate-400 pl-3 py-2">
+  <div class="font-semibold">Addressed rate: 30%</div>
+  <div class="opacity-70">Of Greptile comments acted on — selective, not mechanical. Engineers remain in the loop.</div>
+</div>
+
+</div>
+
+<div>
+<img src="./images/greptile.png" class="rounded shadow w-full" alt="Greptile analytics dashboard" />
+</div>
+
+</div>
+
+---
+
+# Where the AI suggestions land — by language
+
+<div class="grid grid-cols-[1.2fr_1fr] gap-6 items-start">
+
+<div>
+<img src="./images/top-languages.png" class="rounded shadow w-full" alt="Top languages by accepted AI suggestions" />
+</div>
+
+<div class="text-xs space-y-3">
+
+<div class="border-l-4 border-[#E70068] pl-3 py-2">
+  <div class="font-semibold">Python — 18.4k accepted suggestions</div>
+  SKAO's primary science and pipeline language. Control software, data pipelines — all Python. AI suggestions accepted at very high rate.
+</div>
+
+<div class="border-l-4 border-emerald-500 pl-3 py-2">
+  <div class="font-semibold">C++ — 2.1k</div>
+  Low-level telescope control and signal processing. AI still useful for boilerplate, but expert review is heavier here.
+</div>
+
+<div class="border-l-4 border-amber-500 pl-3 py-2">
+  <div class="font-semibold">Shell, RST, YAML, Dockerfile — 500–1.2k each</div>
+  Infrastructure, CI, docs — AI is very effective for these. Low domain-knowledge threshold = high acceptance rate.
+</div>
+
+<div class="border-l-4 border-violet-500 pl-3 py-2">
+  <div class="font-semibold">TypeScript / React — 635 combined</div>
+  Growing fast as the browser-based pipeline interface matures.
+</div>
+
+</div>
+
+</div>
+
+---
+
+# What works, what doesn't — honest assessment
+
+<div class="grid grid-cols-2 gap-6 text-xs">
+
+<div>
+
+**Works well**
+
+<div class="space-y-2 mt-2">
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>Refactoring to patterns.</b> Turning monolithic scripts into library-first services — AI excels when the target structure is clear and the code is Unrestricted.
+</div>
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>Test and CLI scaffolding.</b> Generating pytest fixtures, typer CLI wiring, FastAPI route stubs. High acceptance, low risk.
+</div>
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>PR first-pass review.</b> Greptile catches regressions and security issues that reviewers miss under time pressure.
+</div>
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>Docs and RST.</b> API docs, Sphinx stubs, README updates — large time saving, easy to verify.
+</div>
+</div>
+
+</div>
+
+<div>
+
+**Doesn't work / guardrails**
+
+<div class="space-y-2 mt-2">
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>Domain physics.</b> AI cannot check that UV gridding parameters are scientifically correct. Expert review mandatory.
+</div>
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>Radio Interferometric Software internals.</b> Specialized software and edge cases require hands-on debugging — AI suggestions are often plausible but wrong.
+</div>
+<div class="border-l-2 border-amber-500 pl-2">
+  <b>Never use restricted data.</b> SKAO policy §5.5 — only Unrestricted data enters any AI tool. Science archive credentials, proprietary metadata: never in prompts.
+</div>
+<div class="border-l-2 border-amber-500 pl-2">
+  <b>All generated code is reviewed.</b> Per §5.3.7 — Moderate risk means mandatory QA, not optional. No AI code merges without a human sign-off.
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="mt-3 p-3 bg-[#E70068]/8 border-l-4 border-[#E70068] text-xs">
+  Net verdict: AI coding assistance multiplies throughput on well-understood engineering tasks. It does not substitute for domain expertise in radio interferometry, and SKAO's policy framework makes the boundary explicit.
 </div>
 
 ---
