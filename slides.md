@@ -35,7 +35,7 @@ Deep learning for ALMA imaging — and the petabyte-scale data-access gap it exp
 
 <div class="mt-8 text-sm" style="color:#555555;">
 Michele Delli Veneri &nbsp;·&nbsp; SKA Observatory<br/>
-IVOA Interoperability Meeting — Strasbourg 2026
+IVOA Interoperability Meeting — Strasbourg, 7 – 12 June 2026
 </div>
 
 <div class="mt-6 mx-auto max-w-2xl border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-2 text-xs text-left" style="color:#333333;">
