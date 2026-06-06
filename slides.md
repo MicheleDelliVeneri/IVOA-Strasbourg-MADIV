@@ -43,7 +43,7 @@ IVOA Interoperability Meeting — Strasbourg, 7 – 12 June 2026
 </div>
 
 <div class="abs-br m-6 text-xs" style="color:#777777;">
-Data Curation & Preservation IG &nbsp;·&nbsp; Knowledge Discovery IG
+    CSP Plenary Session on AI
 </div>
 
 <!--
