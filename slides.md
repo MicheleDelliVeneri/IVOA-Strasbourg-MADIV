@@ -39,7 +39,7 @@ IVOA Interoperability Meeting — Strasbourg 2026
 </div>
 
 <div class="mt-6 mx-auto max-w-2xl border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-2 text-xs text-left" style="color:#333333;">
-  Co-funded by <span class="text-[#E70068] font-semibold">ESO</span> and <span class="text-[#E70068] font-semibold">SKAO</span>. Builds on the ESO BRAIN development study (Guglielmetti et al. 2024) and the <code>ALMASim</code> simulator.
+  Co-funded by <span class="text-[#E70068] font-semibold">ESO</span> and <span class="text-[#E70068] font-semibold">SKAO</span>. Builds on the ESO BRAIN development study (Guglielmetti et al. 2024) and the <span class="text-[#E70068] font-semibold">ALMASim</span> simulator.
 </div>
 
 <div class="abs-br m-6 text-xs" style="color:#777777;">
@@ -57,8 +57,6 @@ Data Curation & Preservation IG &nbsp;·&nbsp; Knowledge Discovery IG
 
 # Outline
 
-<v-clicks>
-
 1. **Why now** — ALMA's Wideband Sensitivity Upgrade and the imaging bottleneck
 2. **What BRAIN taught us** — `DeepFocus`, `ALMASim`, and the simulation-to-real generalisation gap
 3. **MADIV in one slide** — ViT + Metadata-Aware Transformer for direct imaging from visibilities
@@ -66,9 +64,7 @@ Data Curation & Preservation IG &nbsp;·&nbsp; Knowledge Discovery IG
 5. **ALMASim today** — library-first, TAP + DataLink under the hood
 6. **The data-access gap** — DataLink was not built for PB-scale bulk training sets
 7. **A call to the IVOA community** — what *ML-ready* products would have to look like
-8. **AI-assisted development at SKAO** — *(part 2 — to be filled in)*
-
-</v-clicks>
+8. **AI-assisted development at SKAO** — coding agents, agentic pipelines, dev practice
 
 ---
 layout: section
@@ -177,7 +173,7 @@ Conclusion: <b>deep learning works</b> for ALMA imaging — when the training di
 
 <div class="text-sm">
 
-BRAIN trained `DeepFocus` primarily on **simulated** cubes. The reason is uncomfortable but simple — at the time, training on real archival data at scale was effectively impossible:
+BRAIN trained `DeepFocus` primarily on simple **simulated** cubes. The reason is uncomfortable but simple — at the time, training on real archival data at scale was effectively impossible and simulations were not capable of matching real data:
 
 </div>
 
@@ -191,12 +187,12 @@ BRAIN trained `DeepFocus` primarily on **simulated** cubes. The reason is uncomf
 
 <div class="border-l-4 border-amber-500 pl-3 py-3">
   <div class="font-semibold mb-1">Simulation noise ≠ real noise</div>
-  Real ALMA noise is <b>spatially correlated, non-Gaussian, baseline-dependent</b>. CASA's <code>simalma</code> / <code>simobserve</code> miss those patterns. <code>NOISEMPIRE</code> was developed to extract empirical noise from real images and inject it back into simulations.
+  Real ALMA noise is <b>spatially correlated, non-Gaussian, baseline-dependent</b>. Simulations available to build groud truths miss those patterns.
 </div>
 
 <div class="border-l-4 border-amber-500 pl-3 py-3">
   <div class="font-semibold mb-1">Limited morphological diversity</div>
-  Single-Gaussian line profiles, point sources, simple disks. Real ALMA targets include complex velocity structures, molecular clouds, mosaics, AGN, protoplanetary substructure.
+  Real ALMA sources include complex morphological and spectral structures, which were not simulable.
 </div>
 
 <div class="border-l-4 border-amber-500 pl-3 py-3">
@@ -375,7 +371,7 @@ Augmented vis + MAT priors feed ViT → clean cubes + anomaly score.
 
 <div class="mt-4 text-xs opacity-80">
 
-**Compute backbone.** STILES ADHOC (UniNa Federico II) — 2 PFLOPS steady-state, 12 PB hot disk, 22 × dual-H100 + 12 × dual-L40 GPU nodes; **NaFCI** (Onsala / Chalmers); SKAO HQ workstations and HPC.
+**Compute backbone.** STILES ADHOC (UniNa Federico II) — 2 PFLOPS steady-state, 12 PB hot disk, 22 × dual-H100 + 12 × dual-L40 GPU nodes
 
 </div>
 
@@ -442,7 +438,7 @@ Same staged API drives the **CLI**, a **FastAPI** backend, and Jupyter notebooks
 
 <div class="text-sm mb-2">
 
-Four sub-apps, one for each stage of the *real-data* workflow. Each is a thin wrapper over the corresponding `services/` module — same API as the library.
+Four sub-apps, one for each stage of the *real-data* workflow. They allow to query, download, calibrate and clean real ALMA data and use it as input for training and for simulating further data with the simulation function.
 
 </div>
 
@@ -576,10 +572,6 @@ DataLink was not designed for tranfering TBs of data for DL training — it was 
   </ol>
 </div>
 
-<div class="mt-2 border-l-4 border-amber-500 bg-amber-50/40 dark:bg-amber-900/15 pl-4 py-2 text-xs">
-  <div class="font-semibold mb-1">From BRAIN, verbatim</div>
-  "Would require <b>thousands of requests via the helpdesk</b> and extensive processing with CASA, averaging <b>1–2 hours per cube</b>."
-</div>
 
 </div>
 </div>
@@ -631,6 +623,7 @@ flowchart LR
   <b>The cost is duplicated.</b> Every group repeats the same calibration, gridding, and HDF5 sharding against the same archive. Compute and bandwidth paid many times over.
 </div>
 
+
 </div>
 
 ---
@@ -652,9 +645,8 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 **The asks, concretely**
 
 1. **A bulk-transfer profile** for DataLink-resolved products — one negotiated session, many files, with backpressure and resume. Whether that's an extension of DataLink, a SODA shape, or a sibling service is a question for this room.
-2. **A processed-products tier**. Calibrated MS, dirty cubes, UV masks — *delivered*, not reconstructed by every consumer. The archive runs the pipeline once, the community trains many models.
-3. **A standardised "ML-ready" container**. HDF5 (or Zarr) shards with explicit conventions for clean / dirty / mask / metadata.
-4. **Metadata coverage in TAP**. Today, ALMA proposal abstracts and the *linked publications* MADIV needs for the MAT are **not exposed through TAP**. They have to be fetched by direct ALMA-staff support. This is fixable.
+2. **A processed-products tier**. Calibrated MS, dirty cubes, UV masks — *delivered*, not reconstructed by every consumer. The archive runs the pipeline once, the community trains many models. Maybe a new standard service for processed products that can introduced within Datalink Service Descriptor?
+3. **A standardised "ML-ready" container**. HDF5 (or Zarr) shards with explicit conventions fore.
 
 </div>
 
@@ -684,12 +676,11 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
 
 - **A signal** on whether a *bulk transfer + processed tier* could be shipped alongside Datalink as a new IVOA standardized service.
-- **Metadata exposure** — what it would take to put proposal abstracts and linked publications behind TAP, with stable IVOIDs.
 - **A community-curated, standards-conformant tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
 
 
 <div class="mt-6 p-4 bg-[#E70068]/8 border-l-4 border-[#E70068] text-sm">
-  Closing the simulation-to-real gap is, fundamentally, a <b>community infrastructure problem</b>. MADIV is one of the projects that has to solve it for itself — but every group will hit it. Let's solve it once.
+Providing ML ready data products and services is fundamentally  a <b>community infrastructure problem</b>. MADIV is one of the projects that has to solve it for itself — but every group will hit it. Let's solve it once.
 </div>
 
 ---
@@ -907,6 +898,60 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 
 <div class="mt-3 p-3 bg-[#E70068]/8 border-l-4 border-[#E70068] text-xs">
   Net verdict: AI coding assistance multiplies throughput on well-understood engineering tasks. It does not substitute for domain expertise in radio interferometry, and SKAO's policy framework makes the boundary explicit.
+</div>
+
+---
+
+# A Radio-Expert LLM for SKAO — the vision
+
+<div class="grid grid-cols-2 gap-6 text-xs">
+
+<div>
+
+**What we are planning to build**
+
+<div class="space-y-2 mt-2">
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>A domain-fine-tuned LLM</b> trained on radio-interferometric literature, SKAO software repositories, and ALMA/SKA pipeline code — a model that "speaks" radio astronomy natively.
+</div>
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>Code assistant.</b> Suggest and generate code and fixes with observatory-level context a general model lacks.
+</div>
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>ADQL / TAP copilot.</b> Natural-language → ADQL translation, context-aware query validation against ObsCore and schemas, interactive refinement before submission.
+</div>
+<div class="border-l-2 border-[#E70068] pl-2">
+  <b>SRCNet & data-access interface.</b> Abstract DataLink resolution, bulk-transfer negotiation, and product classification behind a conversational layer — lower the barrier for non-expert users.
+</div>
+</div>
+
+</div>
+
+<div>
+
+**What works / what doesn't**
+
+<div class="space-y-2 mt-2">
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>Training corpus exists.</b> SKAO GitLab repos, arXiv radio-astro papers — all public, all Unrestricted. Enough text to fine-tune a mid-size open model.
+</div>
+<div class="border-l-2 border-emerald-500 pl-2">
+  <b>ADQL generation is tractable.</b> Schema-constrained generation + retrieval-augmented prompting over TAP metadata already works well with current general LLMs — a domain model would improve reliability further.
+</div>
+<div class="border-l-2 border-amber-500 pl-2">
+  <b>Evaluation is hard.</b> No benchmark exists for "correct radio-interferometric advice." We would have to build one — expert-curated Q&A pairs, ADQL correctness harness, code execution tests.
+</div>
+<div class="border-l-2 border-slate-400 pl-2">
+  <b>Governance.</b> Deploying an LLM as an operational tool inside SRCNet requires SKAO IT/InfoSec assessment — same §5.2.2 path as any third-party tool, even if self-hosted.
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="mt-3 p-3 bg-[#E70068]/8 border-l-4 border-[#E70068] text-xs">
+  Long-term goal: a self-hosted Radio Expert LLM that lowers the expertise barrier for TAP, DataLink, and SRCNet — making archival science accessible to non-specialist users without compromising data governance.
 </div>
 
 ---
