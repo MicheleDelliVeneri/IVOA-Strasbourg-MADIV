@@ -975,7 +975,6 @@ class: text-center
 # Thank you
 
 <div class="text-base opacity-80 mt-6">
-MADIV proposal &nbsp;·&nbsp; <code>ESO/CFP/129249/AMA</code><br/>
 ALMASim &nbsp;·&nbsp; <code>github.com/MicheleDelliVeneri/ALMASim</code><br/>
 BRAIN final report &nbsp;·&nbsp; Guglielmetti et al. 2024<br/>
 Slides &nbsp;·&nbsp; <code>github.com/MicheleDelliVeneri/IVOA-Strasbourg-MADIV</code>
