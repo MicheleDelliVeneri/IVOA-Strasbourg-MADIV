@@ -91,15 +91,16 @@ The **Wideband Sensitivity Upgrade (WSU)** quadruples ALMA's instantaneous bandw
 Image reconstruction is the choke point. Today's products are dominated by **CLEAN** (`tclean` in CASA) — mature, well-understood, but:
 
 1. **Computationally heavy** — channel-by-channel, scales poorly with cube size
-2. **Hard to parallelise** — repeated gridding and Fourier inversions
-3. **Morphologically biased** — optimised for point sources; struggles with extended, low-surface-brightness emission
-4. **Human-intensive** — parameter tuning, masking, QA inspection per dataset
 
 </div>
 
 <div>
 
-<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
+2. **Hard to parallelise** — repeated gridding and Fourier inversions
+3. **Morphologically biased** — optimised for point sources; struggles with extended, low-surface-brightness emission
+4. **Human-intensive** — parameter tuning, masking, QA inspection per dataset
+
+<div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
   <div class="font-semibold mb-1">The ALMA Science Archive already feels the strain</div>
   Mitigation steps applied during pipeline imaging — to keep delivery times reasonable — mean the archive is <b>missing many of the images</b> the pipeline would otherwise produce. <span class="opacity-70">— BRAIN final report, §1</span>
 </div>
@@ -135,7 +136,7 @@ ESO Internal ALMA Development Study (2020–2024) — Guglielmetti, Delli Veneri
 The ESO **BRAIN** study (*Bayesian Reconstruction with Adaptive Image Notion*) explored two complementary AI techniques for ALMA imaging:
 
 - **`RESOLVE`** — astro-statistics, Bayesian imaging via Information Field Theory (NIFTy), with native uncertainty quantification
-- **`DeepFocus`** — astro-informatics, a deep-learning **meta-learner** that finds the best 3D detection/deconvolution architecture for the data at hand
+- **`DEEPFOCUS`** — astro-informatics, a Deep Learning **meta-learner** that cleans and detect sources within radio data cubes
 
 Tested on **simulated** ALMA cubes plus **real** data: HL Tau, BR1202, **DSHARP** and **ALCHEMI** Large Programs, RX J1347.5-1145 (SZ effect).
 
@@ -149,7 +150,7 @@ Companion tool: **`ALMASim`** — open-source ALMA simulator integrated with the
   <div class="font-semibold mb-1">DeepFocus headline numbers</div>
   On 1000 simulated ALMA cubes (256×256×128):
   <ul class="mt-1 ml-4 list-disc">
-    <li><b>Blobs Finder</b> reconstruction on the whole test set: <b>23 s</b> (1× NVIDIA Tesla K20)</li>
+    <li><b>ResNet</b> reconstruction on the whole test set: <b>23 s</b> (1× NVIDIA Tesla K20)</li>
     <li><b>tclean</b> with 200 iterations: <b>4.3 min/cube</b>, ~1.5 h on 50-cube parallel (400 CPUs)</li>
     <li>Net speed-up: <b>~200×</b> on that hardware</li>
   </ul>
@@ -157,7 +158,7 @@ Companion tool: **`ALMASim`** — open-source ALMA simulator integrated with the
 
 <div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/5 pl-4 py-3 text-xs">
   <div class="font-semibold mb-1">Residual quality</div>
-  Blobs Finder residuals within <b>±1σ</b>; <code>tclean</code> residuals deviate beyond <b>±5σ</b> on the same test set (BRAIN final report, §5.5).
+  ResNet residuals within <b>±1σ</b>; <code>tclean</code> residuals deviate beyond <b>±5σ</b> on the same test set (BRAIN final report, §5.5).
 </div>
 
 <div class="mt-3 text-xs opacity-70">
@@ -165,6 +166,29 @@ Conclusion: <b>deep learning works</b> for ALMA imaging — when the training di
 </div>
 
 </div>
+</div>
+
+---
+
+# BRAIN results — A Deconvolution Example
+
+<div class="grid grid-cols-2 gap-6 mt-4">
+  <div class="flex flex-col items-center">
+    <div class="font-semibold text-sm mb-2">DeepFocus</div>
+    <img src="/images/BRAIN_Residual-Example.png" class="w-full object-contain" />
+  </div>
+  <div class="flex flex-col items-center">
+    <div class="font-semibold text-sm mb-2">tCLEAN</div>
+    <img src="/images/TClean_Residual_Example.png" class="w-full object-contain" />
+  </div>
+</div>
+
+---
+
+# BRAIN results — Comparison overt the Test Set
+
+<div class="flex justify-center items-center h-4/5">
+  <img src="/images/Direct_Comparison.png" class="max-h-full object-contain" />
 </div>
 
 ---
@@ -238,19 +262,7 @@ Plus an **anomaly-scoring** head: reconstructions that fall outside the learned 
 
 <div>
 
-<div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
-  <div class="font-semibold mb-1">Why a transformer, not a U-Net?</div>
-  <ul class="mt-1 ml-4 list-disc">
-    <li>Real spectral structures persist coherently <b>across many channels</b>; noise does not — 3D attention can exploit that, channel-by-channel CNNs cannot</li>
-    <li>Adjacent channels are <b>redundant</b>; treating them independently wastes compute</li>
-    <li>Self-attention naturally handles <b>long-range</b> spatial-spectral dependencies — extended emission, mosaics, broad lines</li>
-  </ul>
-</div>
-
-<div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
-  <div class="font-semibold mb-1">Targets</div>
-  Cycle 7 onward, plus Large Programs: <b>DSHARP, ACES, ALMAGAL, ALMA-IMF, ALCHEMI</b>. Public CLEAN products exist for all of these — straightforward A/B comparison.
-</div>
+<img src="/images/MADIV.png" class="w-full object-contain" />
 
 </div>
 </div>
@@ -677,6 +689,7 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
 - **A signal** on whether a *bulk transfer + processed tier* could be shipped alongside Datalink as a new IVOA standardized service.
 - **A community-curated, standards-conformant tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
+- **A new IVOA standard service tasked at providing ML-ready shards and services ** - providing a standardized, community-curated, ML-ready data product service for the IVOA community would greatly enhance the community's ability to explore and mine Astronomical data.
 
 
 <div class="mt-6 p-4 bg-[#E70068]/8 border-l-4 border-[#E70068] text-sm">
