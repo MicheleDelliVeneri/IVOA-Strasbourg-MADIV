@@ -1,3 +1,5 @@
+[![Deploy Slidev to GitHub Pages](https://github.com/MicheleDelliVeneri/IVOA-Strasbourg-MADIV/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/MicheleDelliVeneri/IVOA-Strasbourg-MADIV/actions/workflows/deploy.yml)
+
 # IVOA Strasbourg 2026 — MADIV
 
 Slides for the IVOA Interoperability Meeting in Strasbourg, May 2026.
