@@ -658,7 +658,7 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
 1. **A bulk-transfer profile** for DataLink-resolved products — one negotiated session, many files, with backpressure and resume. Whether that's an extension of DataLink, a SODA shape, or a sibling service is a question for this room.
 2. **A processed-products tier**. Calibrated MS, dirty cubes, UV masks — *delivered*, not reconstructed by every consumer. The archive runs the pipeline once, the community trains many models. Maybe a new standard service for processed products that can introduced within Datalink Service Descriptor?
-3. **A standardised "ML-ready" container**. HDF5 (or Zarr) shards with explicit conventions fore.
+3. **A standardised ML-ready container**. HDF5 (or Zarr) shards with explicit conventions fore.
 
 </div>
 
