@@ -689,7 +689,7 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
 - **A signal** on whether a *bulk transfer + processed tier* could be shipped alongside Datalink as a new IVOA standardized service.
 - **A community-curated, standards-conformant tier** — even at modest scale, this would change what BRAIN-style studies can realistically attempt.
-- **A new IVOA standard service tasked at providing ML-ready shards and services ** - providing a standardized, community-curated, ML-ready data product service for the IVOA community would greatly enhance the community's ability to explore and mine Astronomical data.
+- **A new IVOA standard service tasked at providing ML-ready shards and services** - providing a standardized, community-curated, ML-ready data product service for the IVOA community would greatly enhance the community's ability to explore and mine Astronomical data.
 
 
 <div class="mt-6 p-4 bg-[#E70068]/8 border-l-4 border-[#E70068] text-sm">
