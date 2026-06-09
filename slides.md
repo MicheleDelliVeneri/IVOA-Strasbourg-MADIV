@@ -85,10 +85,11 @@ ALMA 2030, the WSU, and why classical CLEAN is running out of runway
 The **Wideband Sensitivity Upgrade (WSU)** quadruples ALMA's instantaneous bandwidth and dramatically increases data volume and cube complexity.
 
 - ALMA today: **~1 TB / day** of science data
-- ALMA WSU: **at least an order of magnitude more**, with cubes **two orders of magnitude larger** than today's GB-scale cubes
+- ALMA WSU: **at least an order of magnitude more**, with cubes with potentially a milion of channels
 - Looking further out, the **ALMA 2040** vision pushes the trend further still
+- SKAO, ngVLA even more so.
 
-Image reconstruction is the choke point. Today's products are dominated by **CLEAN** (`tclean` in CASA) — mature, well-understood, but:
+Today's pipelines are dominated by **CLEAN** (`tclean` in CASA) — mature, well-understood, but:
 
 1. **Computationally heavy** — channel-by-channel, scales poorly with cube size
 
@@ -100,10 +101,6 @@ Image reconstruction is the choke point. Today's products are dominated by **CLE
 3. **Morphologically biased** — optimised for point sources; struggles with extended, low-surface-brightness emission
 4. **Human-intensive** — parameter tuning, masking, QA inspection per dataset
 
-<div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
-  <div class="font-semibold mb-1">The ALMA Science Archive already feels the strain</div>
-  Mitigation steps applied during pipeline imaging — to keep delivery times reasonable — mean the archive is <b>missing many of the images</b> the pipeline would otherwise produce. <span class="opacity-70">— BRAIN final report, §1</span>
-</div>
 
 <div class="mt-3 border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs">
   <div class="font-semibold mb-1">What the community is asking for</div>
@@ -133,14 +130,14 @@ ESO Internal ALMA Development Study (2020–2024) — Guglielmetti, Delli Veneri
 
 <div>
 
-The ESO **BRAIN** study (*Bayesian Reconstruction with Adaptive Image Notion*) explored two complementary AI techniques for ALMA imaging:
+The ESO **BRAIN** study (*Bayesian Reconstruction with Adaptive Image Notion*) explored two complementary techniques for ALMA imaging:
 
-- **`RESOLVE`** — astro-statistics, Bayesian imaging via Information Field Theory (NIFTy), with native uncertainty quantification
-- **`DEEPFOCUS`** — astro-informatics, a Deep Learning **meta-learner** that cleans and detect sources within radio data cubes
+- **`RESOLVE`** — Bayesian imaging via Information Field Theory (NIFTy), with native uncertainty quantification
+- **`DEEPFOCUS`** — Deep Learning **meta-learner** that cleans and detect sources within radio data cubes -> An Architecturally fine-tuned EfficientNet
 
 Tested on **simulated** ALMA cubes plus **real** data: HL Tau, BR1202, **DSHARP** and **ALCHEMI** Large Programs, RX J1347.5-1145 (SZ effect).
 
-Companion tool: **`ALMASim`** — open-source ALMA simulator integrated with the archive. **`NOISEMPIRE`** — empirical noise model extracted from real ALMA images.
+Companion tool: **`ALMASim`** — open-source ALMA simulator integrated with the ALMA Science Archive.
 
 </div>
 
@@ -197,32 +194,43 @@ Conclusion: <b>deep learning works</b> for ALMA imaging — when the training di
 
 <div class="text-sm">
 
-BRAIN trained `DeepFocus` primarily on simple **simulated** cubes. The reason is uncomfortable but simple — at the time, training on real archival data at scale was effectively impossible and simulations were not capable of matching real data:
+BRAIN trained `DeepFocus` primarily on simple **simulated** cubes. The reason is uncomfortable but simple — at the time, training on real archival data at scale was effectively impossible. 
 
 </div>
 
 <div class="mt-3 grid grid-cols-2 gap-6 text-xs">
 
+<div>
+<div class="font-bold mb-2 text-sm">Data</div>
+
 <div class="border-l-4 border-amber-500 pl-3 py-3">
   <div class="font-semibold mb-1">Archive access at scale</div>
-  Retrieving sufficient real data "would require <b>thousands of requests via the helpdesk</b> and extensive processing with CASA, averaging <b>1–2 hours per cube</b>, rendering the process impractical."<br/>
-  <span class="opacity-70 mt-1 block">— BRAIN final report, §5.5.2</span>
+  Retrieving sufficient real data "would have required <b>thousands of requests via the helpdesk</b> (which you cannot do) or donwloading raw data and perform extensive processing with CASA pipelines"<br/>
+
 </div>
+
+</div>
+
+<div>
+<div class="font-bold mb-2 text-sm">Simulations</div>
 
 <div class="border-l-4 border-amber-500 pl-3 py-3">
   <div class="font-semibold mb-1">Simulation noise ≠ real noise</div>
   Real ALMA noise is <b>spatially correlated, non-Gaussian, baseline-dependent</b>. Simulations available to build groud truths miss those patterns.
 </div>
 
-<div class="border-l-4 border-amber-500 pl-3 py-3">
+<div class="mt-3 border-l-4 border-amber-500 pl-3 py-3">
   <div class="font-semibold mb-1">Limited morphological diversity</div>
   Real ALMA sources include complex morphological and spectral structures, which were not simulable.
 </div>
 
-<div class="border-l-4 border-amber-500 pl-3 py-3">
-  <div class="font-semibold mb-1">Models trained on simulations don't generalise</div>
-  Models trained on simulation distributions <b>do not transfer reliably</b> to real ALMA cubes. This is the well-known ML failure mode — and it bites hard in radio interferometry.
 </div>
+
+</div>
+
+<div class="mt-4 text-sm">
+
+Models trained on simulation distributions do not transfer reliably to real ALMA cubes. This is the well-known ML failure mode — and it bites hard in radio interferometry.
 
 </div>
 
@@ -334,72 +342,6 @@ Augmented vis + MAT priors feed ViT → clean cubes + anomaly score.
 
 </div>
 
----
-
-# Three work packages, 36 months
-
-<div class="grid grid-cols-3 gap-3 text-xs">
-
-<div class="border-l-4 border-emerald-500 bg-emerald-50/40 dark:bg-emerald-900/15 pl-3 py-3">
-  <div class="font-semibold mb-1">WP1 · M1–12</div>
-  <div class="opacity-90 mb-2">Enhanced ALMASim + dataset</div>
-  <ul class="ml-4 list-disc">
-    <li>Archive integration (raw vis, calib, metadata, abstracts, papers)</li>
-    <li>Web app (FastAPI + Svelte)</li>
-    <li>CLI and Slurm optimization</li>
-    <li>Diffusion model refinement</li>
-    <li>Physical data augmentation</li>
-    <li><b>D1.1</b> ALMASim v2 release</li>
-    <li><b>D1.2</b> Public multi-modal dataset</li>
-  </ul>
-</div>
-
-<div class="border-l-4 border-[#E70068] bg-[#E70068]/5 pl-3 py-3">
-  <div class="font-semibold mb-1">WP2 · M10–24</div>
-  <div class="opacity-90 mb-2">ViT + MAT pipeline</div>
-  <ul class="ml-4 list-disc">
-    <li>ViT architecture for visibility-domain input</li>
-    <li>3D spatial-spectral attention</li>
-    <li>MAT ingestion of abstracts + metadata + papers</li>
-    <li>Anomaly scoring module</li>
-    <li>End-to-end automated pipeline</li>
-    <li><b>D2.1–D2.4</b> components &amp; integrated pipeline</li>
-  </ul>
-</div>
-
-<div class="border-l-4 border-violet-500 bg-violet-50/40 dark:bg-violet-900/15 pl-3 py-3">
-  <div class="font-semibold mb-1">WP3 · M20–36</div>
-  <div class="opacity-90 mb-2">Validation &amp; science demos</div>
-  <ul class="ml-4 list-disc">
-    <li>Training/validation on Cycle 7+ archival data</li>
-    <li>Benchmarking vs <code>tclean</code> &amp; other baselines</li>
-    <li>Science demonstrations (PPDs, high-z galaxies)</li>
-    <li>Readiness for archival mining + RADPS integration</li>
-    <li><b>D3.1</b> benchmarks, <b>D3.2</b> demo papers, <b>D3.3</b> prototype</li>
-  </ul>
-</div>
-
-</div>
-
-<div class="mt-4 text-xs opacity-80">
-
-**Compute backbone.** STILES ADHOC (UniNa Federico II) — 2 PFLOPS steady-state, 12 PB hot disk, 22 × dual-H100 + 12 × dual-L40 GPU nodes
-
-</div>
-
-<div class="mt-3 text-xs opacity-70">
-
-**Why this matters beyond ALMA.** The same architecture, dataset patterns, and AI workflows are transferable to <b>SKA</b> and <b>ngVLA</b> — both will need scalable, automated imaging at PB/yr data rates.
-
-</div>
-
----
-layout: section
----
-
-# 4 · ALMASim today
-
-What we already have — and what WP1 has to upgrade
 
 ---
 
@@ -436,7 +378,7 @@ Same staged API drives the **CLI**, a **FastAPI** backend, and Jupyter notebooks
 
 <div class="border-l-4 border-[#E70068] bg-[#E70068]/8 pl-4 py-3 text-xs mb-3">
   <div class="font-semibold mb-1">Why library-first</div>
-  WP1 needs ALMASim to be <b>callable</b> from training loops, Dask graphs, Slurm jobs, and a browser-based UI — without rewriting the simulation logic four times.
+  ALMASim can be <b>callable</b> from training loops, Dask graphs, Slurm jobs, MCP Tools and a browser-based UI.
 </div>
 
 <img src="./images/almasim-frontend.png" class="rounded shadow w-full" alt="ALMASim v2 web frontend" />
@@ -453,6 +395,9 @@ Same staged API drives the **CLI**, a **FastAPI** backend, and Jupyter notebooks
 Four sub-apps, one for each stage of the *real-data* workflow. They allow to query, download, calibrate and clean real ALMA data and use it as input for training and for simulating further data with the simulation function.
 
 </div>
+
+<div class="grid grid-cols-[3fr_1.4fr] gap-0 items-start">
+<div>
 
 ```bash
 almasim --help
@@ -473,6 +418,23 @@ almasim products calibrate --products-csv products.csv  # applycal (casatasks)
 
 almasim simulation run     --skymodel point --backend local --save-format h5
 ```
+
+</div>
+<div class="flex flex-col text-xs pl-2">
+  <div class="mt-[4.8rem] border-l-2 border-amber-500 pl-2 py-1 leading-tight">
+    ← TAP query abstracts to<br/>users &amp; LLM → <code>metadata.csv</code>
+  </div>
+  <div class="mt-[2.6rem] border-l-2 border-[#E70068] pl-2 py-1 leading-tight">
+    ← DataLink resolution
+  </div>
+  <div class="mt-[0.6rem] border-l-2 border-blue-500 pl-2 py-1 leading-tight">
+    ← parallel across<br/>3 ESO mirrors
+  </div>
+  <div class="mt-[3.4rem] border-l-2 border-slate-400 pl-2 py-1 leading-tight opacity-70">
+    radio interferometry<br/>&amp; ALMA pipelines
+  </div>
+</div>
+</div>
 
 <div class="mt-3 grid grid-cols-2 gap-3 text-xs">
   <div class="border-l-4 border-emerald-500 pl-3 py-2">
@@ -536,7 +498,7 @@ sequenceDiagram
 
 <div class="border-l-2 border-amber-500 pl-2">
 <div class="font-semibold">4 · ASDM → MS → applycal</div>
-<div class="opacity-80 mt-0.5">CASA <code>importasdm</code>, then <code>applycal</code> with delivered calibration tables. <b>This step is where the wheels start coming off.</b></div>
+<div class="opacity-80 mt-0.5">Runs WSCLEAN and generates clean fits cubes.</div>
 </div>
 
 </div>
@@ -547,13 +509,13 @@ sequenceDiagram
 layout: section
 ---
 
-# 5 · The data-access gap
+# 4 · The data-access gap
 
 DataLink was not designed for tranfering TBs of data for DL training — it was designed for *retrieval* of observations 
 
 ---
 
-# What works, what doesn't
+# Data Retrieval what works, what doesn't
 
 <div class="grid grid-cols-2 gap-6 text-xs">
 
@@ -569,7 +531,7 @@ DataLink was not designed for tranfering TBs of data for DL training — it was 
 
 - Need **thousands** of OUSs from Cycle 7+ — not one dataset
 - **Tens to hundreds of TB** of raw vis + cal tables; **PB-scale** across all Cycles
-- Sustained bulk transfer is **not what DataLink was designed for**
+- Sustained bulk transfer
 
 </div>
 
@@ -642,7 +604,7 @@ flowchart LR
 layout: section
 ---
 
-# 6 · A call to the IVOA community
+# 5 · A call to the IVOA community
 
 What would *ML-ready* delivery look like — and why it benefits more than MADIV
 
@@ -657,7 +619,7 @@ What would *ML-ready* delivery look like — and why it benefits more than MADIV
 **The asks, concretely**
 
 1. **A bulk-transfer profile** for DataLink-resolved products — one negotiated session, many files, with backpressure and resume. Whether that's an extension of DataLink, a SODA shape, or a sibling service is a question for this room.
-2. **A processed-products tier**. Calibrated MS, dirty cubes, UV masks — *delivered*, not reconstructed by every consumer. The archive runs the pipeline once, the community trains many models. Maybe a new standard service for processed products that can introduced within Datalink Service Descriptor?
+2. **A processed-products tier**. Calibrated MS, dirty cubes, UV masks — *delivered*, not reconstructed by every consumer. The archive runs the pipeline once, the community trains many models. Maybe a new standard service for processed products that can introduced within Datalink **Service Descriptor**?
 3. **A standardised ML-ready container**. HDF5 (or Zarr) shards with explicit conventions fore.
 
 </div>
@@ -700,9 +662,9 @@ Providing ML ready data products and services is fundamentally  a <b>community i
 layout: section
 ---
 
-# 7 · AI-assisted development at SKAO
+# 6 · AI-assisted development at SKAO
 
-How we are building MADIV — coding agents, agentic pipelines, dev practice
+How we are building SKAO software and MADIV — coding agents, agentic pipelines, dev practice
 
 ---
 
@@ -717,7 +679,7 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 <div class="mt-2 space-y-2">
 
 <div class="border-l-4 border-emerald-500 pl-3 py-1.5">
-  <b>Science data excluded.</b> §3.3 — AI solutions used solely for science data are out of scope. MADIV abides to this regulation and infact it is exploring only on ALMA data.
+  <b>Science data excluded.</b> §3.3 — AI solutions used solely for science data and pipelines are out of scope. MADIV abides to this regulation and infact it is exploring only on ALMA data.
 </div>
 
 <div class="border-l-4 border-[#E70068] pl-3 py-1.5">
@@ -758,9 +720,8 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
   <div class="font-semibold mb-1">Claude Code / GPT  — agentic coding assistant</div>
   <ul class="ml-4 list-disc space-y-0.5">
     <li>Used for most software development at the SKA Observatory</li>
-    <li>Used for ALMASim v2 refactoring — library-first architecture, service decomposition</li>
-    <li>FastAPI + Svelte UI scaffolding and iteration</li>
-    <li>Simulation pipeline code, HDF5 shard format, CLI wiring</li>
+    <li>Used for code refactoring, service decomposition, containerisation and testing</li>
+    <li>FastAPI + Svelte UI scaffolding and iteration for UI development</li>
     <li>Slides and documentation drafting (this talk!)</li>
   </ul>
 </div>
@@ -888,7 +849,7 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 </div>
 <div>
 
-**Doesn't work / guardrails**
+**Doesn't work**
 
 <div class="space-y-2 mt-2">
 <div class="border-l-2 border-[#E70068] pl-2">
@@ -896,12 +857,6 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
 </div>
 <div class="border-l-2 border-[#E70068] pl-2">
   <b>Radio Interferometric Software internals.</b> Specialized software and edge cases require hands-on debugging — AI suggestions are often plausible but wrong.
-</div>
-<div class="border-l-2 border-amber-500 pl-2">
-  <b>Never use restricted data.</b> SKAO policy §5.5 — only Unrestricted data enters any AI tool. Science archive credentials, proprietary metadata: never in prompts.
-</div>
-<div class="border-l-2 border-amber-500 pl-2">
-  <b>All generated code is reviewed.</b> Per §5.3.7 — Moderate risk means mandatory QA, not optional. No AI code merges without a human sign-off.
 </div>
 </div>
 
