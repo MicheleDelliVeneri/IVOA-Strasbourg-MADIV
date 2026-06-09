@@ -889,6 +889,9 @@ SKAO's AI use is governed by **SKAO-GOV-0000166** (Rev 01, 2024). Key rules for 
   <b>ADQL / TAP copilot.</b> Natural-language → ADQL translation, context-aware query validation against ObsCore and schemas, interactive refinement before submission.
 </div>
 <div class="border-l-2 border-[#E70068] pl-2">
+  <b>SKAO PI assistance.</b> Guiding the PI through the proposal submission process, scheduling, and data access.
+</div>
+<div class="border-l-2 border-[#E70068] pl-2">
   <b>SRCNet & data-access interface.</b> Abstract DataLink resolution, bulk-transfer negotiation, and product classification behind a conversational layer — lower the barrier for non-expert users.
 </div>
 </div>
